@@ -6,15 +6,27 @@ Copyright (c) 2019 - present AppSeed.us
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.template import loader
 from django.urls import reverse
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
+    if not request.user.profile.profile_active:
+        return redirect('updateprofile')
 
-    html_template = loader.get_template('home/index.html')
+    context = {'segment': 'index'}
+    html_template = loader.get_template('home/dashboard.html')
+    return HttpResponse(html_template.render(context, request))
+
+@login_required(login_url="/login/")
+def settings(request):
+    if not request.user.profile.profile_active:
+        return redirect('updateprofile')
+
+    context = {'segment': 'index'}
+    html_template = loader.get_template('home/settings.html')
     return HttpResponse(html_template.render(context, request))
 
 

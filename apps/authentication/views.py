@@ -4,9 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 # Create your views here.
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from .forms import LoginForm, SignUpForm
+from .forms import LoginForm, SignUpForm, UserForm, ProfileForm
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
+from .models import Profile
 
 
 def login_view(request):
@@ -43,10 +48,10 @@ def register_user(request):
             raw_password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=raw_password)
 
-            msg = 'User created - please <a href="/login">login</a>.'
+            msg = form.cleaned_data.get("email")
             success = True
 
-            # return redirect("/login/")
+            return render(request, "accounts/verify_email.html", {"msg": msg, "success": success})
 
         else:
             msg = 'Form is not valid'
@@ -54,3 +59,27 @@ def register_user(request):
         form = SignUpForm()
 
     return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
+
+@login_required
+@transaction.atomic
+def update_profile(request):
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            form_obj = profile_form.save(commit=False)
+            form_obj.profile_active = True
+            form_obj.save()
+
+            messages.success(request, _('Your profile was successfully updated!'))
+            return redirect('/')
+        else:
+            messages.error(request, _('Please correct the error below.'))
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+    return render(request, 'home/settings.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
