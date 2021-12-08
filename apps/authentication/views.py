@@ -37,7 +37,10 @@ def login_view(request):
                 login(request, user)
                 return redirect("/")
             else:
-                msg = 'Invalid credentials'
+                if User.objects.filter(username=username):
+                    msg = "User is not active"
+                else:
+                    msg = 'Invalid credentials'
         else:
             msg = 'Error validating the form'
 
