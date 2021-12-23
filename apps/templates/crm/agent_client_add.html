@@ -56,6 +56,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <div>
+                                <label for="id_age">{{agent_client_form.age.label}}</label>
+                                <input class="form-control" id="id_age" name="age"  type="number" placeholder="{{agent_client_form.age.label}}" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                           <div>
+                                <input class="form-control" id="id_source" name="source"  type="hidden" placeholder="{{agent_client_form.source.label}}" value="manually added">
+                            </div>
+                        </div>
+                    </div>
                     <div class="mt-3">
                         <button class="btn btn-gray-800 mt-2 animate-up-2" type="submit">Save all</button>
                     </div>

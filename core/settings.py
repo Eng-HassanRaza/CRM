@@ -79,22 +79,32 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'db.sqlite3',
+#     }
+# }
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'crmdb',
-#         'USER': 'crmuser',
-#         'PASSWORD': 'crmpass',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
+#         'NAME': 'develop',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Advoco@999!',
+#         'HOST': '34.124.160.45',
+#         'PORT': '5432' ,
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'crmdb',
+        'USER': 'crmuser',
+        'PASSWORD': 'crmpass',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

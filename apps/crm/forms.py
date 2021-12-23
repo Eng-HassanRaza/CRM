@@ -11,7 +11,7 @@ from .validators import validate_file_extension
 class AgentClientForm(forms.ModelForm):
     class Meta:
         model = agent_clients
-        fields = ('appointment_scheduled', 'product', 'name','surname','gender','phone_number')
+        fields = ('appointment_scheduled', 'product', 'name','surname','gender','phone_number','age','source')
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()

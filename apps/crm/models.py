@@ -9,5 +9,7 @@ class agent_clients(models.Model):
     surname = models.CharField(max_length=200, null=True,blank=True)
     gender = models.CharField(max_length=200, null=True,blank=True)
     phone_number = models.CharField(max_length=200, null=True,blank=True)
+    source = models.CharField(max_length=200, null=True,blank=True)
+    age = models.IntegerField(null=True,blank=True)
     def __str__(self):
         return self.name

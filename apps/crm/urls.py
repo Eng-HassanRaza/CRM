@@ -10,4 +10,5 @@ urlpatterns = [
     # The home page
     path('agent_client', views.agent_client, name='agent_client'),
     path('agent_client/add/', views.agent_client_add, name='agent_client_add'),
+    path('start_calls', views.start_calls, name='start_calls'),
 ]
