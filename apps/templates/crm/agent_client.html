@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-
+{% load custom_filters %}
 {% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
@@ -52,12 +52,16 @@
                               <th class="border-0">Phone Number</th>
                               <th class="border-0">Age</th>
                               <th class="border-0">Source</th>
+                              <th class="border-0">Tags</th>
+                              <th class="border-0" colspan="3">Remarks</th>
+                              <th class="border-0">Download Event</th>
                           </tr>
                       </thead>
                       <tbody>
                           <!-- Item -->
                           {%for data in agent_data %}
                           <tr>
+
                               <td class="border-0"><a href="#" class="text-primary font-weight-bold">{{forloop.counter}}</a> </td>
                               <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>{{data.appointment_scheduled}}</td>
                               <td class="border-0">
@@ -81,6 +85,20 @@
                               <td class="border-0">
                                   {{data.source}}
                               </td>
+                              <td class="border-0" style="width:200px">
+                                  <select class="form-select tag_selected" aria-label="Default select example" style="width:200px">
+                                      {% for tag in agent_tags %}
+                                        <option {% if data.tag == tag %} selected {% endif %} value="{{data.id}}">{{tag|trim}}</option>
+                                      {%endfor%}
+                                    </select>
+                              </td>
+                              <td class="border-0" style="width:200px" rows=1 colspan=3>
+                                  <textarea class="form-control client_remarks" data-clientid = {{data.id}} style="width:200px"  id="exampleFormControlTextarea1" >{{ data.remarks }}</textarea>
+                              </td>
+                              <td class="border-0" style="width:200px" rows=1 colspan=3>
+                                <a class="btn btn-primary" href="{% url 'download_event' data.id %}">Download</a>
+                              </td>
+
 
                           </tr>
                           {%endfor%}
@@ -106,5 +124,44 @@
     $("#importbtn").click(function(e){
         $("#customFile").click();
     });
+
+    $('.tag_selected').on('change', function() {
+        var selected_tag = $(this).find(":selected").text();
+        var client_id = $(this).find(":selected").val();
+        var tag_change_fn = true
+          $.ajax({
+             headers: {'X-CSRFToken': '{{csrf_token}}'},
+             url: '{% url "agent_client" %}',
+             data : {"selected_tag":selected_tag,"client_id":client_id,"tag_change_fn":tag_change_fn},
+             type: "GET",
+             dataType: 'json',
+            success: function(data){
+                console.log(data.success);
+            },
+            error: function(data){
+              alert('error; '+ eval(error));
+            }
+          });
+           return false;
+        });
+    $('.client_remarks').on('focusout', function(e) {
+        e.preventDefault();
+        var client_remarks = $(this).val();
+        var client_id = $(this).data("clientid");
+          $.ajax({
+             headers: {'X-CSRFToken': '{{csrf_token}}'},
+             url: '{% url "agent_client" %}',
+             data : {"client_remarks":client_remarks,"client_id":client_id},
+             type: "GET",
+             dataType: 'json',
+            success: function(data){
+                console.log(data.success);
+            },
+            error: function(data){
+              alert('error; '+ eval(error));
+            }
+          });
+           return false;
+    })
 </script>
 {% endblock javascripts %}

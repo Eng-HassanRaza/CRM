@@ -10,6 +10,28 @@ class agent_clients(models.Model):
     gender = models.CharField(max_length=200, null=True,blank=True)
     phone_number = models.CharField(max_length=200, null=True,blank=True)
     source = models.CharField(max_length=200, null=True,blank=True)
+    tag = models.CharField(max_length=200, default="new lead", null=True,blank=True)
+    remarks = models.TextField(null=True,blank=True)
     age = models.IntegerField(null=True,blank=True)
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return f"/agents_client/{self.id}/"
+
+class AgentClientTags(models.Model):
+    client_id = models.UUIDField(blank=True,null=True)
+    client_tag = models.CharField(max_length=200, null=True,blank=True)
+    tag_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.client_id)
+
+
+class AgentClientRemarks(models.Model):
+    client_id = models.UUIDField(blank=True,null=True)
+    client_remarks = models.CharField(max_length=200, null=True,blank=True)
+    remarks_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.client_id)
