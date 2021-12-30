@@ -1,5 +1,6 @@
 import uuid
-
+import datetime
+import xlwt as xlwt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -142,3 +143,105 @@ def create_icsfile(request,id):
     response['Content-Type'] = 'text/plain'
     response['Content-Disposition'] = 'attachment; filename=Event.ics'
     return response
+def download_excelfile(request):
+        # content-type of response
+        response = HttpResponse(content_type='application/ms-excel')
+
+        # decide file name
+        response['Content-Disposition'] = 'attachment; filename="add_clients_template.xls"'
+
+        # creating workbook
+        wb = xlwt.Workbook(encoding='utf-8')
+
+        # adding sheet
+        ws = wb.add_sheet("sheet1")
+
+        # Sheet header, first row
+        row_num = 0
+
+        font_style = xlwt.XFStyle()
+        # headers are bold
+        font_style.font.bold = True
+
+        # column header names, you can use your own headers here
+        columns = ['appointment_secehdule', 'product', 'name', 'surname','phone_number','age' ]
+
+        # write column headers in sheet
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+
+       # get your data, from database or from a text file...
+      #  data = get_data()  # dummy method to fetch data.
+        #for my_row in data:
+        for i in range(0,1):
+            row_num = row_num + 1
+            ws.write(row_num, 0, "2021/12/15 10:00", font_style)
+            ws.write(row_num, 1, "life insurance", font_style)
+            ws.write(row_num, 2, "tan", font_style)
+            ws.write(row_num, 3, "m", font_style)
+            ws.write(row_num, 4, "6512341234", font_style)
+            ws.write(row_num, 5, "12", font_style)
+
+        wb.save(response)
+        return response
+
+
+def download_startcall(request):
+    # content-type of response
+    response = HttpResponse(content_type='application/ms-excel')
+
+    # decide file name
+    response['Content-Disposition'] = 'attachment; filename="add_phonenumber_template.xls"'
+
+    # creating workbook
+    wb = xlwt.Workbook(encoding='utf-8')
+
+    # adding sheet
+    ws = wb.add_sheet("sheet1")
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    # headers are bold
+    font_style.font.bold = True
+
+    # column header names, you can use your own headers here
+    columns = ['phone_number']
+
+    # write column headers in sheet
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    # get your data, from database or from a text file...
+    #  data = get_data()  # dummy method to fetch data.
+    # for my_row in data:
+    for i in range(0, 3):
+        row_num = row_num + 1
+        ws.write(row_num, 0, "6512341234", font_style)
+
+
+    wb.save(response)
+    return response
+def ajax_date(request):
+    data = dict()
+    if request.is_ajax and request.method == "POST":
+        client_id = request.POST.get("client_id", None)
+        agent_date = request.POST.get("client_date", None)
+
+        date_time = datetime.datetime.strptime(agent_date, '%Y-%m-%dT%H:%M')
+
+
+        query=agent_clients.objects.filter(id=client_id).first()
+        query.appointment_scheduled = date_time
+        query.save()
+        data['html_table'] = True
+    return JsonResponse(data)
+
+
