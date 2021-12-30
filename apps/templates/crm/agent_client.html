@@ -65,7 +65,7 @@
                             <!--  <td class="border-0 font-weight-bold"><span class="icon icon-xs icon-gray w-30"><span class="fas fa-globe-europe"></span></span>
                                   <input type="datetime-local" id="birthdaytime" name="birthdaytime" value="{{data.appointment_scheduled}}">{{data.appointment_scheduled}}</td>-->
                               <td class="border-0" id="date" value="{{data.id}}">
-                              <input type="datetime-local" id="client" name="appointment_scheduled" value="{{data.appointment_scheduled|datefilter}}" />
+                              <input type="datetime-local" id="client" name="appointment_scheduled" value="{{data.appointment_scheduled|date:'Y-m-d'}}T{{data.appointment_scheduled.time|date:'H:i'}}" />
                               </td>
                               <td class="border-0">
                                   {{data.product}}
