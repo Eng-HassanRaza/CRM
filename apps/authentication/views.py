@@ -85,6 +85,7 @@ def register_user(request):
 @transaction.atomic
 def update_profile(request):
     if request.method == 'POST':
+        usr = request.POST.get("insurance_company", None)
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = ProfileForm(request.POST, instance=request.user.profile)
         if user_form.is_valid() and profile_form.is_valid():
@@ -92,10 +93,11 @@ def update_profile(request):
             form_obj = profile_form.save(commit=False)
             form_obj.profile_active = True
             form_obj.save()
-
+            query=Profile.objects.filter(insurance_company=usr).first()
             messages.success(request, _('Your profile was successfully updated!'))
             return redirect('/')
         else:
+            return render(request,'accounts/account_validation.html')
             messages.error(request, _('Please correct the error below.'))
     else:
         user_form = UserForm(instance=request.user)
@@ -122,3 +124,4 @@ def activate(request, uidb64, token,backend='django.contrib.auth.backends.ModelB
     else:
         success = False
         return render(request, "accounts/invalid_email_verification_link.html", {"success": success})
+

@@ -10,7 +10,10 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.urls import reverse
 
+from apps.authentication.midllewares.auth import auth_middleware
 
+
+@auth_middleware
 @login_required(login_url="/login/")
 def index(request):
     if not request.user.profile.profile_active:
@@ -19,7 +22,7 @@ def index(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
-
+@auth_middleware
 @login_required(login_url="/login/")
 def settings(request):
     if not request.user.profile.profile_active:
@@ -29,7 +32,7 @@ def settings(request):
     html_template = loader.get_template('home/settings.html')
     return HttpResponse(html_template.render(context, request))
 
-
+@auth_middleware
 @login_required(login_url="/login/")
 def pages(request):
     context = {}

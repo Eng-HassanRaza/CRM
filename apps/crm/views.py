@@ -18,9 +18,11 @@ from django.conf import settings
 from sqlalchemy import create_engine
 
 from ..home.models import InitiateCalls
+from apps.authentication.midllewares.auth import auth_middleware
 
 
 @login_required(login_url="/login/")
+@auth_middleware
 def agent_client(request):
     agent_tags = ["new lead","reschedule a callback", "appointment set", "follow up", "burst deal", "win deal"]
     if not request.user.profile.profile_active:
@@ -68,7 +70,7 @@ def agent_client(request):
     context = {'segment': 'agent_client','agent_data':agent_client_data,'message':msg, "agent_tags":agent_tags}
     html_template = loader.get_template('crm/agent_client.html')
     return HttpResponse(html_template.render(context, request))
-
+@auth_middleware
 @login_required(login_url="/login/")
 def agent_client_add(request):
     if not request.user.profile.profile_active:
@@ -89,11 +91,13 @@ def agent_client_add(request):
         'agent_client_form': agent_client_form,
     })
 
-
+@auth_middleware
 @login_required(login_url="/login/")
 def start_calls(request):
     if not request.user.profile.profile_active:
         return redirect('updateprofile')
+    if not request.user.profile.agent_active:
+        return("agentnotactive")
     if request.method == 'POST':
         if request.FILES:
             df = pd.read_excel(request.FILES['file'])
@@ -114,7 +118,7 @@ def start_calls(request):
         'completed_calls': completed_calls,
     })
 
-
+@auth_middleware
 @login_required(login_url="/login/")
 def create_icsfile(request,id):
     ICS_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -143,6 +147,7 @@ def create_icsfile(request,id):
     response['Content-Type'] = 'text/plain'
     response['Content-Disposition'] = 'attachment; filename=Event.ics'
     return response
+@auth_middleware
 def download_excelfile(request):
         # content-type of response
         response = HttpResponse(content_type='application/ms-excel')
@@ -188,7 +193,7 @@ def download_excelfile(request):
         wb.save(response)
         return response
 
-
+@auth_middleware
 def download_startcall(request):
     # content-type of response
     response = HttpResponse(content_type='application/ms-excel')
@@ -229,6 +234,7 @@ def download_startcall(request):
 
     wb.save(response)
     return response
+@auth_middleware
 def ajax_date(request):
     data = dict()
     if request.is_ajax and request.method == "POST":

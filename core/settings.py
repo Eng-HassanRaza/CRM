@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    #'core.custom_middleware.middleware.CustomMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'

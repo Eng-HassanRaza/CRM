@@ -17,6 +17,7 @@ class Profile(models.Model):
     insurance_company = models.CharField(max_length=255, blank=True)
     insurance_license_number = models.CharField(max_length=255, blank=True)
     profile_active = models.BooleanField(default=False)
+    agent_active = models.BooleanField(default=False)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
