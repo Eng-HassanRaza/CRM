@@ -13,21 +13,17 @@ from django.urls import reverse
 from apps.authentication.midllewares.auth import auth_middleware
 
 
-@auth_middleware
-@login_required(login_url="/login/")
-def index(request):
-    if not request.user.profile.profile_active:
-        return redirect('updateprofile')
 
+@login_required(login_url="/login/")
+@auth_middleware
+def index(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
-@auth_middleware
-@login_required(login_url="/login/")
-def settings(request):
-    if not request.user.profile.profile_active:
-        return redirect('updateprofile')
 
+@login_required(login_url="/login/")
+@auth_middleware
+def settings(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/settings.html')
     return HttpResponse(html_template.render(context, request))

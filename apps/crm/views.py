@@ -25,8 +25,6 @@ from apps.authentication.midllewares.auth import auth_middleware
 @auth_middleware
 def agent_client(request):
     agent_tags = ["new lead","reschedule a callback", "appointment set", "follow up", "burst deal", "win deal"]
-    if not request.user.profile.profile_active:
-        return redirect('updateprofile')
     msg=""
     if request.is_ajax():
         agent_client_req = agent_clients.objects.filter(id=request.GET['client_id']).first()
@@ -47,6 +45,8 @@ def agent_client(request):
         df.columns=["appointment_scheduled", "product", "name","surname", "gender", "phone_number","age"]
         df["id"] = [uuid.uuid4() for _ in range(len(df.index))]
         df["source"] = ["manually added" for _ in range(len(df.index))]
+        df["agent_id"] = [request.user.id for _ in range(len(df.index))]
+        df["created_at"] = [datetime.datetime.now() for _ in range(len(df.index))]
         df.set_index("id", inplace=True)
         user = settings.DATABASES['default']['USER']
         password = settings.DATABASES['default']['PASSWORD']
@@ -66,20 +66,21 @@ def agent_client(request):
         except:
             msg = "database not connected"
         df.to_sql('crm_agent_clients', con=engine,  if_exists='append')
-    agent_client_data = agent_clients.objects.all().order_by("-appointment_scheduled")
+    agent_client_data = agent_clients.objects.filter(agent=request.user).order_by("-created_at")
     context = {'segment': 'agent_client','agent_data':agent_client_data,'message':msg, "agent_tags":agent_tags}
     html_template = loader.get_template('crm/agent_client.html')
     return HttpResponse(html_template.render(context, request))
-@auth_middleware
-@login_required(login_url="/login/")
-def agent_client_add(request):
-    if not request.user.profile.profile_active:
-        return redirect('updateprofile')
 
+
+@login_required(login_url="/login/")
+@auth_middleware
+def agent_client_add(request):
     if request.method == 'POST':
         agent_client_form = AgentClientForm(request.POST)
         if agent_client_form.is_valid():
-            agent_client_form.save()
+            instance = agent_client_form.save(commit=False)
+            instance.agent = request.user
+            instance.save()
 
             messages.success(request, _('Your profile was successfully updated!'))
             return redirect('/crm/agent_client')
@@ -91,13 +92,9 @@ def agent_client_add(request):
         'agent_client_form': agent_client_form,
     })
 
-@auth_middleware
 @login_required(login_url="/login/")
+@auth_middleware
 def start_calls(request):
-    if not request.user.profile.profile_active:
-        return redirect('updateprofile')
-    if not request.user.profile.agent_active:
-        return("agentnotactive")
     if request.method == 'POST':
         if request.FILES:
             df = pd.read_excel(request.FILES['file'])
@@ -118,7 +115,7 @@ def start_calls(request):
         'completed_calls': completed_calls,
     })
 
-@auth_middleware
+
 @login_required(login_url="/login/")
 def create_icsfile(request,id):
     ICS_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -147,7 +144,8 @@ def create_icsfile(request,id):
     response['Content-Type'] = 'text/plain'
     response['Content-Disposition'] = 'attachment; filename=Event.ics'
     return response
-@auth_middleware
+
+@login_required(login_url="/login/")
 def download_excelfile(request):
         # content-type of response
         response = HttpResponse(content_type='application/ms-excel')
@@ -193,7 +191,7 @@ def download_excelfile(request):
         wb.save(response)
         return response
 
-@auth_middleware
+@login_required(login_url="/login/")
 def download_startcall(request):
     # content-type of response
     response = HttpResponse(content_type='application/ms-excel')
@@ -234,7 +232,8 @@ def download_startcall(request):
 
     wb.save(response)
     return response
-@auth_middleware
+
+@login_required(login_url="/login/")
 def ajax_date(request):
     data = dict()
     if request.is_ajax and request.method == "POST":

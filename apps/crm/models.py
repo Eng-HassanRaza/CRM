@@ -1,8 +1,10 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import User
 # Create your models here.
 class agent_clients(models.Model):
     id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
+    agent = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     appointment_scheduled = models.DateTimeField(max_length=255,blank=True, null=True)
     product = models.CharField(max_length=200, null=True,blank=True)
     name = models.CharField(max_length=200, null=True,blank=True)
@@ -13,6 +15,7 @@ class agent_clients(models.Model):
     tag = models.CharField(max_length=200, default="new lead", null=True,blank=True)
     remarks = models.TextField(null=True,blank=True)
     age = models.IntegerField(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
 
