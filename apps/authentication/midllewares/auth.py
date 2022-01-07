@@ -7,11 +7,12 @@ def auth_middleware(get_response):
     def middleware(request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
-        if not request.user.profile.profile_active:
-            return redirect('updateprofile')
+        if request.user.id:
+            if not request.user.profile.profile_active:
+                return redirect('updateprofile')
 
-        if not request.user.profile.agent_active:
-            return render(request,'accounts/account_validation.html')
+            if not request.user.profile.agent_active:
+                return render(request,'accounts/account_validation.html')
 
         response = get_response(request)
 
